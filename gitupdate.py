@@ -42,6 +42,17 @@ class Repository(object):
             yield r.returncode
 
     def update_remotes(self):
+        os.chdir(self.path)
+
+        r = sp.chock_output((GIT_COMMAND, 'remote', '-v'),
+                            universal_newlines=True)
+
+        git_remotes = {}
+        for remote in r.stdout:
+            n, u, t = remote.split(' ')
+            if 'push' in t:
+                git_remotes[n] = u
+
         pass
 
     @property
