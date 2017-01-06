@@ -43,7 +43,7 @@ class Repository(object):
 
     @property
     def path(self):
-        return os.path.abspath(GIT_ROOT + '/' + self.name)
+        return os.path.abspath(GIT_ROOT + '/' + self.name + '.git')
 
     def __repr__(self):
         return '{}: {}'.format(self.name, ' '.join(self.remotes.values()))
