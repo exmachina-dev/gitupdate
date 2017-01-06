@@ -15,7 +15,7 @@ from configparser import ConfigParser
 
 GIT_COMMAND = '/usr/bin/git'
 GIT_ROOT = '/home/git/repositories'
-GITUPDATE_ROOT = 'home/git/gitupdate'
+GITUPDATE_ROOT = '/home/git/gitupdate'
 
 
 class Repository(object):
