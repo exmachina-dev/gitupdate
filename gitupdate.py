@@ -41,6 +41,9 @@ class Repository(object):
                        stdout=sp.PIPE, stderr=sp.PIPE)
             yield r.returncode
 
+    def update_remotes(self):
+        pass
+
     @property
     def path(self):
         return os.path.abspath(GIT_ROOT + '/' + self.name + '.git')
