@@ -65,7 +65,7 @@ class Repository(object):
             return False
 
         # Removing remotes erased from config files
-        for git_remote, url in self.git_remotes.items():
+        for git_remote, url in git_remotes.items():
             if git_remote not in self.remotes.keys():
                 print('Removing remote {}:'.format(git_remote), end='')
                 if not sp.run((GIT_COMMAND, 'remote', 'remove',
