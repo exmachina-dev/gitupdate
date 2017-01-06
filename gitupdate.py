@@ -133,18 +133,26 @@ class Gitupdate(object):
 
             self.repositories[repo].update()
         else:
+            errors = 0
             for n, r in self.repositories.items():
                 print('Updating {}'.format(n))
 
                 for res in r.update():
                     if isinstance(res, tuple):
                         n, u = res
-                        print('Updating {} remote:'.format(n), end='')
+                        print('\t{} remote:'.format(n), end='')
                     else:
                         if res.returncode != 0:
-                            print(' Failed:', res.stderr)
+                            print(' Failed:')
+                            print()
+                            print(res.stderr.decode())
+                            errors += 1
                         else:
                             print(' Done.')
+
+            if errors:
+                print('\n{} repositories failed to update, check configuration.'.format(errors))
+                os.exit(1)
 
     def update_remotes(self, repo=None):
         if repo:
