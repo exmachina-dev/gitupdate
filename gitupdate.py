@@ -67,7 +67,7 @@ class Repository(object):
         # Removing remotes erased from config files
         for git_remote, url in git_remotes.items():
             if git_remote not in self.remotes.keys():
-                print('Removing remote {}:'.format(git_remote), end='')
+                print(' removing remote {}:'.format(git_remote), end='')
                 if not sp.run((GIT_COMMAND, 'remote', 'remove',
                               git_remote)):
                     print(' Failed.')
@@ -78,7 +78,7 @@ class Repository(object):
         for cnf_remote, url in self.remotes.items():
             if cnf_remote in git_remotes.keys():
                 if url != git_remotes[cnf_remote]:
-                    print('Updating remote {} to {}:'.format(cnf_remote, url),
+                    print(' updating remote {} to {}:'.format(cnf_remote, url),
                            end='')
                     if not sp.run((GIT_COMMAND, 'remote', 'set-url',
                                   cnf_remote, url)):
@@ -86,7 +86,7 @@ class Repository(object):
                     else:
                         print(' Done.')
             else:
-                print('Adding remote {} at {}:'.format(cnf_remote, url), end='')
+                print(' adding remote {} at {}:'.format(cnf_remote, url), end='')
                 if not sp.run((GIT_COMMAND, 'remote', 'add', cnf_remote, url)):
                     print(' Failed.')
                 else:
