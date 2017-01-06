@@ -74,16 +74,33 @@ class Gitupdate(object):
         self._conf.read(files)
 
     def update(self, repo=None):
-        if repo and repo not in self._repos.keys():
-            raise ValueError('Unable to find repository {}.'.format(repo))
-
         if repo:
+            if repo not in self._repos.keys():
+                raise ValueError('Unable to find repository {}.'.format(repo))
+
             self.repositories[repo].update()
         else:
             for n, r in self.repositories.items():
                 print('Updating {}'.format(n))
 
                 for res in r.update():
+                    if isinstance(res, tuple):
+                        n, u = res
+                        print('Updating {} remote:'.format(n),)
+                    else:
+                        print(' {}'.format(res))
+
+    def update_remotes(self, repo=None):
+        if repo:
+            if repo not in self._repos.keys():
+                raise ValueError('Unable to find repository {}.'.format(repo))
+
+            self.repositories[repo].update_remotes()
+        else:
+            for n, r in self.repositories.items():
+                print('Updating {}'.format(n))
+
+                for res in r.update_remotes():
                     print(res)
 
     @property
@@ -94,7 +111,7 @@ class Gitupdate(object):
 if __name__ == '__main__':
     import argparse
 
-    COMMANDS = ('list', 'update', 'remote')
+    COMMANDS = ('list', 'update', 'update_remotes')
     parser = argparse.ArgumentParser(description="Update git repositories")
     parser.add_argument('command', type=str, choices=COMMANDS,
                         help="Command to execute")
@@ -110,3 +127,5 @@ if __name__ == '__main__':
         print(' '.join(gu.repositories))
     elif args.command == 'update':
         gu.update(args.repository)
+    elif args.command == 'update_remotes':
+        gu.update_remotes(args.repository)
