@@ -151,7 +151,7 @@ class Gitupdate(object):
             self.repositories[repo].update_remotes()
         else:
             for n, r in self.repositories.items():
-                print('Updating {}'.format(n), end='')
+                print('Updating {}:'.format(n), end='')
 
                 if r.update_remotes():
                     print('\tDone.')
