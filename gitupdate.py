@@ -39,7 +39,7 @@ class Repository(object):
             yield remote, url
             r = sp.run((GIT_COMMAND, 'push', '--mirror', remote),
                        stdout=sp.PIPE, stderr=sp.PIPE)
-            yield r.returncode
+            yield r
 
     def update_remotes(self):
         os.chdir(self.path)
@@ -141,7 +141,10 @@ class Gitupdate(object):
                         n, u = res
                         print('Updating {} remote:'.format(n), end='')
                     else:
-                        print(' {}'.format(res))
+                        if res.returncode != 0:
+                            print(' Failed:', res.stderr)
+                        else:
+                            print(' Done.')
 
     def update_remotes(self, repo=None):
         if repo:
