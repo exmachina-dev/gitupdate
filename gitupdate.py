@@ -51,12 +51,42 @@ class Repository(object):
             raise ValueError('Something bad happened: {}'.format(r.returncode))
 
         git_remotes = {}
-        for remote in r.stdout:
-            n, u, t = remote.split(' ')
+        print(r.stdout)
+        for remote in r.stdout.split('\n'):
+            if len(remote) == 0:
+                continue
+
+            r, t = remote.split(" ")
+            n, u = r.split('\t')
             if 'push' in t:
                 git_remotes[n] = u
 
-        pass
+        # Removing remotes erased from config files
+        for git_remote, url in self.git_remotes.items():
+            if git_remote not in self.remotes.keys():
+                print('Removing remote {}:'.format(git_remote))
+                if not sp.run((GIT_COMMAND, 'remote', 'remove',
+                              git_remote)):
+                    print(' Failed.')
+                else:
+                    print(' Done.')
+
+        # Adding or updating remotes from config files
+        for cnf_remote, url in self.remotes.items():
+            if cnf_remote in git_remotes.keys():
+                if url != git_remotes[cnf_remote]:
+                    print('Updating remote {} to {}:'.format(cnf_remote, url),)
+                    if not sp.run((GIT_COMMAND, 'remote', 'set-url',
+                                  cnf_remote, url)):
+                        print(' Failed.')
+                    else:
+                        print(' Done.')
+            else:
+                print('Adding remote {} at {}:'.format(cnf_remote, url),)
+                if not sp.run((GIT_COMMAND, 'remote', 'add', cnf_remote, url)):
+                    print(' Failed.')
+                else:
+                    print(' Done.')
 
     @property
     def path(self):
@@ -117,8 +147,7 @@ class Gitupdate(object):
             for n, r in self.repositories.items():
                 print('Updating {}'.format(n))
 
-                for res in r.update_remotes():
-                    print(res)
+                r.update_remotes()
 
     @property
     def repositories(self):
