@@ -51,7 +51,7 @@ class Repository(object):
             raise ValueError('Something bad happened: {}'.format(r.returncode))
 
         git_remotes = {}
-        print(r.stdout)
+
         for remote in r.stdout.split('\n'):
             if len(remote) == 0:
                 continue
@@ -61,10 +61,13 @@ class Repository(object):
             if 'push' in t:
                 git_remotes[n] = u
 
+        if git_remotes == self.remotes:
+            return False
+
         # Removing remotes erased from config files
         for git_remote, url in self.git_remotes.items():
             if git_remote not in self.remotes.keys():
-                print('Removing remote {}:'.format(git_remote))
+                print('Removing remote {}:'.format(git_remote), end='')
                 if not sp.run((GIT_COMMAND, 'remote', 'remove',
                               git_remote)):
                     print(' Failed.')
@@ -75,18 +78,21 @@ class Repository(object):
         for cnf_remote, url in self.remotes.items():
             if cnf_remote in git_remotes.keys():
                 if url != git_remotes[cnf_remote]:
-                    print('Updating remote {} to {}:'.format(cnf_remote, url),)
+                    print('Updating remote {} to {}:'.format(cnf_remote, url),
+                           end='')
                     if not sp.run((GIT_COMMAND, 'remote', 'set-url',
                                   cnf_remote, url)):
                         print(' Failed.')
                     else:
                         print(' Done.')
             else:
-                print('Adding remote {} at {}:'.format(cnf_remote, url),)
+                print('Adding remote {} at {}:'.format(cnf_remote, url), end='')
                 if not sp.run((GIT_COMMAND, 'remote', 'add', cnf_remote, url)):
                     print(' Failed.')
                 else:
                     print(' Done.')
+
+        return True
 
     @property
     def path(self):
@@ -133,7 +139,7 @@ class Gitupdate(object):
                 for res in r.update():
                     if isinstance(res, tuple):
                         n, u = res
-                        print('Updating {} remote:'.format(n),)
+                        print('Updating {} remote:'.format(n), end='')
                     else:
                         print(' {}'.format(res))
 
@@ -145,9 +151,12 @@ class Gitupdate(object):
             self.repositories[repo].update_remotes()
         else:
             for n, r in self.repositories.items():
-                print('Updating {}'.format(n))
+                print('Updating {}'.format(n), end='')
 
-                r.update_remotes()
+                if r.update_remotes():
+                    print('\tDone.')
+                else:
+                    print(' Nothing to do.')
 
     @property
     def repositories(self):
