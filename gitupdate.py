@@ -6,6 +6,7 @@
 
 
 import os
+import sys
 import subprocess as sp
 from glob import glob
 from configparser import ConfigParser
@@ -14,6 +15,7 @@ from configparser import ConfigParser
 
 GIT_COMMAND = '/usr/bin/git'
 GIT_ROOT = '/home/git/repositories'
+GITUPDATE_ROOT = 'home/git/gitupdate'
 
 
 class Repository(object):
@@ -152,7 +154,7 @@ class Gitupdate(object):
 
             if errors:
                 print('\n{} repositories failed to update, check configuration.'.format(errors))
-                os.exit(1)
+                sys.exit(1)
 
     def update_remotes(self, repo=None):
         if repo:
@@ -186,7 +188,7 @@ if __name__ == '__main__':
 
     args = parser.parse_args()
 
-    gu = Gitupdate('./conf')
+    gu = Gitupdate(GITUPDATE_ROOT + '/conf')
 
     if args.command == 'list':
         print('Available repositories:')
