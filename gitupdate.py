@@ -44,8 +44,11 @@ class Repository(object):
     def update_remotes(self):
         os.chdir(self.path)
 
-        r = sp.chock_output((GIT_COMMAND, 'remote', '-v'),
-                            universal_newlines=True)
+        r = sp.run((GIT_COMMAND, 'remote', '-v'),
+                   stdout=sp.PIPE, universal_newlines=True)
+
+        if r.returncode != 0:
+            raise ValueError('Something bad happened: {}'.format(r.returncode))
 
         git_remotes = {}
         for remote in r.stdout:
