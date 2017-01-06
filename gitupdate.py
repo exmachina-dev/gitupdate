@@ -6,10 +6,14 @@
 
 
 import os
+import subprocess as sp
 from glob import glob
 from configparser import ConfigParser
 
 # import config
+
+GIT_COMMAND = '/usr/bin/git'
+GIT_ROOT = '/home/git/repositories'
 
 
 class Repository(object):
@@ -29,7 +33,17 @@ class Repository(object):
                     raise ValueError('Invalid key found: {}'.format(k))
 
     def update(self):
-        return True
+        os.chdir(self.path)
+
+        for remote, url in self.remotes.items():
+            yield remote, url
+            r = sp.run((GIT_COMMAND, 'push', '--mirror', remote),
+                       stdout=sp.PIPE, stderr=sp.PIPE)
+            yield r.returncode
+
+    @property
+    def path(self):
+        return os.path.abspath(GIT_ROOT + '/' + self.name)
 
     def __repr__(self):
         return '{}: {}'.format(self.name, ' '.join(self.remotes.values()))
@@ -68,7 +82,9 @@ class Gitupdate(object):
         else:
             for n, r in self.repositories.items():
                 print('Updating {}'.format(n))
-                r.update()
+
+                for res in r.update():
+                    print(res)
 
     @property
     def repositories(self):
