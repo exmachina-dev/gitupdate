@@ -139,37 +139,54 @@ class Gitupdate(object):
             for n, r in self.repositories.items():
                 print('Updating {}'.format(n))
 
-                for res in r.update():
-                    if isinstance(res, tuple):
-                        n, u = res
-                        print('\t{} remote:'.format(n), end='')
-                    else:
-                        if res.returncode != 0:
-                            print(' Failed:')
-                            print()
-                            print(res.stderr.decode())
-                            errors += 1
+                try:
+                    for res in r.update():
+                        if isinstance(res, tuple):
+                            n, u = res
+                            print('\t{} remote:'.format(n), end='')
                         else:
-                            print(' Done.')
+                            if res.returncode != 0:
+                                print(' Failed:')
+                                print()
+                                print(res.stderr.decode())
+                                errors += 1
+                            else:
+                                print(' Done.')
+                except Exception as e:
+                    print('\tUnexpected error: {!s}'.format(e))
+                    errors +=1
 
             if errors:
                 print('\n{} repositories failed to update, check configuration.'.format(errors))
                 sys.exit(1)
 
     def update_remotes(self, repo=None):
+        errors = 0
         if repo:
             if repo not in self._repos.keys():
                 raise ValueError('Unable to find repository {}.'.format(repo))
 
-            self.repositories[repo].update_remotes()
+            try:
+                self.repositories[repo].update_remotes()
+            except Exception as e:
+                print('\tUnexpected error: {!s}'.format(e))
+                errors +=1
         else:
             for n, r in self.repositories.items():
                 print('Updating {}:'.format(n), end='')
 
-                if r.update_remotes():
-                    print('\tDone.')
-                else:
-                    print(' Nothing to do.')
+                try:
+                    if r.update_remotes():
+                        print('\tDone.')
+                    else:
+                        print(' Nothing to do.')
+                except Exception as e:
+                    print('\tUnexpected error: {!s}'.format(e))
+                    errors +=1
+
+        if errors:
+            print('Failed to update remotes on \n{} repositories, check configuration.'.format(errors))
+            sys.exit(1)
 
     @property
     def repositories(self):
