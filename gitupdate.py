@@ -133,7 +133,22 @@ class Gitupdate(object):
             if repo not in self._repos.keys():
                 raise ValueError('Unable to find repository {}.'.format(repo))
 
-            self.repositories[repo].update()
+            try:
+                for res in self.repositories[repo].update():
+                    if isinstance(res, tuple):
+                        n, u = res
+                        print('\t{} remote:'.format(n), end='')
+                    else:
+                        if res.returncode != 0:
+                            print(' Failed:')
+                            print()
+                            print(res.stderr.decode())
+                            errors += 1
+                        else:
+                            print(' Done.')
+            except Exception as e:
+                print('\tUnexpected error: {!s}'.format(e))
+                errors +=1
         else:
             errors = 0
             for n, r in self.repositories.items():
