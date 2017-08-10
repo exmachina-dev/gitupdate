@@ -133,6 +133,8 @@ class Gitupdate(object):
             if repo not in self._repos.keys():
                 raise ValueError('Unable to find repository {}.'.format(repo))
 
+            print('Updating {}'.format(repo))
+
             try:
                 for res in self.repositories[repo].update():
                     if isinstance(res, tuple):
@@ -224,7 +226,7 @@ if __name__ == '__main__':
 
     if args.command == 'list':
         print('Available repositories:')
-        print(' '.join(gu.repositories))
+        print(' \n'.join(gu.repositories))
     elif args.command == 'update':
         gu.update(args.repository)
     elif args.command == 'update_remotes':
