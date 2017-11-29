@@ -129,6 +129,8 @@ class Gitupdate(object):
         self._conf.read(files)
 
     def update(self, repo=None):
+        errors = 0
+
         if repo:
             if repo not in self._repos.keys():
                 raise ValueError('Unable to find repository {}.'.format(repo))
@@ -152,7 +154,6 @@ class Gitupdate(object):
                 print('\tUnexpected error: {!s}'.format(e))
                 errors +=1
         else:
-            errors = 0
             for n, r in self.repositories.items():
                 print('Updating {}'.format(n))
 
@@ -173,9 +174,9 @@ class Gitupdate(object):
                     print('\tUnexpected error: {!s}'.format(e))
                     errors +=1
 
-            if errors:
-                print('\n{} repositories failed to update, check configuration.'.format(errors))
-                sys.exit(1)
+        if errors:
+            print('\n{} repositories failed to update, check configuration.'.format(errors))
+            sys.exit(1)
 
     def update_remotes(self, repo=None):
         errors = 0
